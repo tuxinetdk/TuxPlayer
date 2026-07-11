@@ -4,7 +4,7 @@
 
 TuxPlayer provides one permanent MP3 stream for Twitch audio, so Music Assistant only needs a single stable URL:
 
-`http://192.168.2.124:8766/stream/`
+`http://SERVER_IP:8766/stream/`
 
 If no channel is selected, the selected channel is offline, or Streamlink/FFmpeg fails, TuxPlayer serves silence instead of returning `404`. The project is designed for local Docker deployment with a simple admin UI.
 
@@ -45,16 +45,16 @@ docker compose up -d --build
 
 ## Access
 
-- UI: [http://192.168.2.124:8766](http://192.168.2.124:8766)
-- Health endpoint: `http://192.168.2.124:8766/health`
-- Status API: `http://192.168.2.124:8766/api/status`
-- Permanent stream: `http://192.168.2.124:8766/stream/`
+- UI: [http://SERVER_IP:8766](http://SERVER_IP:8766)
+- Health endpoint: `http://SERVER_IP:8766/health`
+- Status API: `http://SERVER_IP:8766/api/status`
+- Permanent stream: `http://SERVER_IP:8766/stream/`
 
 ## Music Assistant
 
 Add only this single URL:
 
-`http://192.168.2.124:8766/stream/`
+`http://SERVER_IP:8766/stream/`
 
 You do not need one URL per DJ or channel.
 
@@ -65,7 +65,7 @@ The project uses `.env`. Start from `.env.example`.
 Important variables:
 
 - `TZ=Europe/Copenhagen`
-- `PUBLIC_BASE_URL=http://192.168.2.124:8766`
+- `PUBLIC_BASE_URL=http://SERVER_IP:8766`
 - `STREAM_IDLE_TIMEOUT=30`
 - `STREAM_BITRATE=160k`
 - `STREAM_SAMPLE_RATE=44100`
