@@ -1,21 +1,135 @@
-MIT License
+TuxPlayer No-Resale License
+Version 1.0
 
 Copyright (c) 2026 Thomas / TuxiNet
+All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. Permission
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Subject to the terms of this License, you are granted a worldwide,
+royalty-free, non-exclusive license to:
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+a. install and use TuxPlayer (the "Software") for personal, educational,
+hobby, professional, or internal business purposes;
+
+b. inspect and study the source code;
+
+c. modify the Software for your own use; and
+
+d. redistribute unmodified or modified copies of the Software free of
+charge, provided that all requirements in this License are followed.
+
+Using the Software as part of your own work, business, live stream,
+broadcast, event, or production is permitted, provided that you are not
+selling, licensing, renting, or commercially providing the Software itself.
+
+2. No Sale or Paid Redistribution
+
+You may not, without prior written permission from the Copyright Holder:
+
+a. sell, rent, lease, sublicense, or otherwise provide the Software in
+exchange for money, payment, subscription fees, donations required for
+access, or any other commercial benefit;
+
+b. charge for downloading, installing, accessing, or receiving a copy of
+the Software;
+
+c. include the Software or a modified version of it in a paid software
+product, paid bundle, subscription, or commercial distribution;
+
+d. offer the Software or a modified version as a paid hosted, managed,
+cloud, or Software-as-a-Service product;
+
+e. rebrand, rename, or modify the Software for the purpose of selling or
+commercially distributing it; or
+
+f. claim ownership of the original Software or represent an unofficial
+version as an official TuxPlayer or TuxiNet release.
+
+Reasonable charges for independent consulting, configuration, training,
+or technical support are permitted, provided that the Software itself
+remains available without charge and is not being sold as part of that
+service.
+
+3. Redistribution Requirements
+
+Any permitted redistribution must:
+
+a. be provided completely free of charge;
+
+b. include this License in full;
+
+c. retain all copyright, attribution, and trademark notices;
+
+d. clearly state whether the Software has been modified;
+
+e. identify the distributor of any modified version; and
+
+f. make it clear that modified versions are unofficial and are not
+supported or endorsed by Thomas or TuxiNet.
+
+Modified versions must be distributed under this same License. You may
+not apply additional terms that permit sale or paid redistribution.
+
+4. Commercial Licensing
+
+Commercial redistribution, resale, paid hosting, incorporation into a
+paid product, or other uses prohibited by this License require a separate
+written commercial license from Thomas / TuxiNet.
+
+Permission is only valid when provided explicitly in writing by the
+Copyright Holder.
+
+5. Ownership
+
+The Software is licensed, not sold.
+
+This License does not transfer ownership of the Software, source code,
+TuxPlayer name, TuxiNet name, logos, branding, artwork, or other
+intellectual property.
+
+All rights not expressly granted by this License are reserved by the
+Copyright Holder.
+
+6. Contributions
+
+Unless otherwise agreed in writing, any code, documentation, fixes, or
+other contributions submitted to the official TuxPlayer project may be
+included in TuxPlayer and distributed under this License.
+
+By intentionally submitting a contribution, you confirm that you have
+the right to submit it and grant the Copyright Holder permission to use,
+modify, license, and distribute that contribution as part of TuxPlayer.
+
+7. Termination
+
+Your rights under this License terminate automatically if you violate
+any of its terms.
+
+Upon termination, you must stop distributing and commercially providing
+the Software. Termination does not limit any other rights or remedies
+available to the Copyright Holder.
+
+8. Disclaimer of Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
+
+THE COPYRIGHT HOLDER DOES NOT GUARANTEE THAT THE SOFTWARE WILL BE
+ERROR-FREE, SECURE, OR SUITABLE FOR ANY PARTICULAR PURPOSE.
+
+9. Limitation of Liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE COPYRIGHT HOLDER SHALL NOT BE
+LIABLE FOR ANY CLAIM, DAMAGE, LOSS, OR OTHER LIABILITY ARISING FROM OR
+RELATED TO THE SOFTWARE OR THE USE, MODIFICATION, OR DISTRIBUTION OF THE
 SOFTWARE.
+
+10. Governing Law
+
+This License is governed by the laws of Denmark, without regard to
+conflict-of-law principles.
+
+Any dispute relating to this License shall be subject to the jurisdiction
+of the competent courts of Denmark.
