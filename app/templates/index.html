@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}TuxPlayer Admin{% endblock %}
+{% block content %}
+{% if notice %}
+<div class="notice">{{ notice }}</div>
+{% endif %}
+
+<section class="panel panel-grid">
+  <div class="card">
+    <h2>Fast streamadresse</h2>
+    <p class="stream-url">{{ settings.stream_url }}</p>
+    <p>Tilføj kun denne ene URL i Music Assistant.</p>
+  </div>
+  <div class="card">
+    <h2>Aktuel status</h2>
+    <dl class="status-list" id="status-panel">
+      <div><dt>Valgt kanal</dt><dd id="status-active">{{ status.active_channel or "Ingen valgt" }}</dd></div>
+      <div><dt>Kildestatus</dt><dd id="status-state" class="state state-{{ status.source_state }}">{{ status.source_state }}</dd></div>
+      <div><dt>Stream aktiv</dt><dd id="status-running">{{ "Ja" if status.stream_running else "Nej" }}</dd></div>
+      <div><dt>Lyttere</dt><dd id="status-listeners">{{ status.listeners }}</dd></div>
+      <div><dt>Oppetid</dt><dd id="status-uptime">{{ status.uptime_seconds }} sek.</dd></div>
+      <div><dt>Seneste fejl</dt><dd id="status-error">{{ status.last_error or "Ingen" }}</dd></div>
+      <div><dt>Streamlink PID</dt><dd id="status-streamlink-pid">{{ status.streamlink_pid or "-" }}</dd></div>
+      <div><dt>FFmpeg PID</dt><dd id="status-ffmpeg-pid">{{ status.ffmpeg_pid or "-" }}</dd></div>
+      <div><dt>CPU / RAM</dt><dd id="status-usage">{{ status.cpu_percent if status.cpu_percent is not none else "-" }} % / {{ status.memory_mb if status.memory_mb is not none else "-" }} MB</dd></div>
+    </dl>
+    <div class="button-row">
+      <form method="post" action="/stream/stop">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="button danger" type="submit">Stop Twitch-kilde</button>
+      </form>
+      <form method="post" action="/stream/restart">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="button" type="submit">Genstart kilde</button>
+      </form>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Lydniveau</h2>
+    <form method="post" action="/settings/volume" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>
+        <span>Volumen: <strong id="volume-value">{{ "%.1f"|format(status.stream_volume) }}x</strong></span>
+        <input
+          id="volume-range"
+          class="range"
+          name="stream_volume"
+          type="range"
+          min="0.5"
+          max="3.0"
+          step="0.1"
+          value="{{ "%.1f"|format(status.stream_volume) }}"
+        >
+      </label>
+      <p class="muted">1.0 er normal styrke. Højere værdier løfter Twitch-lyden, men for højt kan give forvrængning.</p>
+      <button class="button primary" type="submit">Gem volumen</button>
+    </form>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="card">
+    <h2>Tilføj DJ</h2>
+    <form method="post" action="/channels" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>
+        <span>Twitch-brugernavn</span>
+        <input name="twitch_name" type="text" maxlength="25" required>
+      </label>
+      <label>
+        <span>Visningsnavn</span>
+        <input name="display_name" type="text" maxlength="100" required>
+      </label>
+      <label class="toggle"><input name="favorite" type="checkbox" value="1"> <span>Favorit</span></label>
+      <label class="toggle"><input name="enabled" type="checkbox" value="1" checked> <span>Aktiv</span></label>
+      <button class="button primary" type="submit">Tilføj DJ</button>
+    </form>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>DJ-liste</h2>
+  {% if channels %}
+  <div class="channel-grid">
+    {% for channel in channels %}
+    <article class="card channel-card {% if active_channel and active_channel.id == channel.id %}is-active{% endif %}">
+      <div class="channel-head">
+        <h3>{{ channel.display_name }}</h3>
+        <span class="pill {% if active_channel and active_channel.id == channel.id %}pill-green{% else %}pill-gray{% endif %}">
+          {% if active_channel and active_channel.id == channel.id %}Aktiv{% else %}Ikke aktiv{% endif %}
+        </span>
+      </div>
+      <p class="muted">@{{ channel.twitch_name }}</p>
+      <p class="muted">
+        {% if channel.favorite %}Favorit{% else %}Standard{% endif %}
+        ·
+        {% if channel.enabled %}Aktiv{% else %}Inaktiv{% endif %}
+      </p>
+      <form method="post" action="/channels/{{ channel.id }}/update" class="stack">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>
+          <span>Twitch-brugernavn</span>
+          <input name="twitch_name" type="text" value="{{ channel.twitch_name }}" maxlength="25" required>
+        </label>
+        <label>
+          <span>Visningsnavn</span>
+          <input name="display_name" type="text" value="{{ channel.display_name }}" maxlength="100" required>
+        </label>
+        <label class="toggle"><input name="favorite" type="checkbox" value="1" {% if channel.favorite %}checked{% endif %}> <span>Favorit</span></label>
+        <label class="toggle"><input name="enabled" type="checkbox" value="1" {% if channel.enabled %}checked{% endif %}> <span>Aktiv</span></label>
+        <div class="button-row">
+          <button class="button" type="submit">Gem</button>
+          <button class="button secondary" formaction="/channels/{{ channel.id }}/select" type="submit">Vælg</button>
+          <button class="button secondary" formaction="/channels/{{ channel.id }}/favorite" type="submit">Skift favorit</button>
+        </div>
+        <div class="button-row">
+          <button class="button secondary" formaction="/channels/{{ channel.id }}/test" type="submit">Test kanal</button>
+          <button class="button danger js-confirm-delete" formaction="/channels/{{ channel.id }}/delete" type="submit">Slet DJ</button>
+        </div>
+      </form>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card">
+    <p>Ingen DJ’s endnu. Tilføj den første kanal ovenfor.</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

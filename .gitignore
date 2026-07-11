@@ -1,0 +1,14 @@
+.env
+.agents/
+__pycache__/
+.pytest_cache/
+.venv/
+.idea/
+.vscode/
+Thumbs.db
+*.log
+*.pyc
+data/*.db
+data/*.db-shm
+data/*.db-wal
+tuxplayer.md

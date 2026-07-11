@@ -1,0 +1,15 @@
+services:
+  tuxplayer:
+    build:
+      context: .
+    container_name: tuxplayer
+    restart: unless-stopped
+    network_mode: bridge
+    ports:
+      - "8766:8080"
+    env_file:
+      - .env
+    environment:
+      TZ: ${TZ:-Europe/Copenhagen}
+    volumes:
+      - ./data:/app/data

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="da">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}TuxPlayer{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+  </head>
+  <body>
+    <div class="shell">
+      <header class="hero">
+        <img
+          class="hero-banner"
+          src="/static/banner.png"
+          alt="TuxPlayer banner"
+          onerror="this.style.display='none';"
+        >
+        <div>
+          <p class="eyebrow">TuxPlayer</p>
+          <h1>Fast Twitch-lyd til Music Assistant</h1>
+          <p class="lede">En fast MP3-stream med stilhed som fallback, så Home Assistant altid kan beholde samme URL.</p>
+        </div>
+      </header>
+      {% block content %}{% endblock %}
+    </div>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
