@@ -171,6 +171,10 @@ docker compose up -d
 - local Codex/test artifacts are ignored
 - `app/static/banner.png` is used at the top of this README and in the web UI
 
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE).
+
 ## Project Structure
 
 ```text
