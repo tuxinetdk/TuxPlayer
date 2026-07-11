@@ -173,7 +173,11 @@ docker compose up -d
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE).
+TuxPlayer is source-available under the TuxPlayer No-Resale License.
+
+You may use and modify the software for personal, educational, professional, and internal business purposes. You may not sell, rent, sublicense, commercially redistribute, or offer TuxPlayer as a paid service without prior written permission from Thomas / TuxiNet.
+
+See the LICENSE file for the full license terms.
 
 ## Project Structure
 
