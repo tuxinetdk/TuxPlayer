@@ -183,6 +183,29 @@ def _assert_no_compose_up(project_dir: Path) -> None:
     assert "compose up -d --build" not in _docker_log_lines(project_dir)
 
 
+def _inputs_before_start_now(existing_env: bool) -> str:
+    values = [
+        "yes" if existing_env else None,
+        "server.local",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+    ]
+    return "\n".join(value for value in values if value is not None) + "\n"
+
+
 @pytest.mark.skipif(os.name == "nt", reason="POSIX file modes are not available on Windows")
 def test_install_sh_sets_env_permissions_to_0600(tmp_path: Path):
     project_dir = _copy_installer_fixture(tmp_path)
@@ -417,6 +440,31 @@ def test_install_sh_stops_on_input_end_without_writing_env(tmp_path: Path):
     _assert_no_compose_up(project_dir)
 
 
+@pytest.mark.parametrize("existing_env", [False, True])
+def test_install_sh_stops_on_input_end_at_start_now_prompt_without_changing_env(tmp_path: Path, existing_env: bool):
+    project_dir = _copy_installer_fixture(tmp_path)
+    original_content = "KEEP_ME='yes'\n"
+    if existing_env:
+        (project_dir / ".env").write_text(original_content, encoding="utf-8")
+
+    process = _open_install_process(project_dir)
+    assert process.stdin is not None
+    process.stdin.write(_inputs_before_start_now(existing_env))
+    process.stdin.flush()
+    process.stdin.close()
+    stdout, stderr = process.communicate(timeout=10)
+
+    output = stderr + stdout
+    assert process.returncode != 0
+    assert "Input ended. Installation cancelled." in output
+    if existing_env:
+        assert (project_dir / ".env").read_text(encoding="utf-8") == original_content
+    else:
+        assert not (project_dir / ".env").exists()
+    assert list(project_dir.glob(".env.tmp.*")) == []
+    _assert_no_compose_up(project_dir)
+
+
 @pytest.mark.skipif(os.name == "nt", reason="POSIX signal behavior is tested on Unix")
 def test_install_sh_handles_sigint_without_overwriting_existing_env(tmp_path: Path):
     project_dir = _copy_installer_fixture(tmp_path)
@@ -433,5 +481,44 @@ def test_install_sh_handles_sigint_without_overwriting_existing_env(tmp_path: Pa
     assert process.returncode in (130, -signal.SIGINT)
     assert "Installation cancelled." in (stderr + stdout)
     assert original_env.read_text(encoding="utf-8") == "KEEP_ME='yes'\n"
+    assert list(project_dir.glob(".env.tmp.*")) == []
+    _assert_no_compose_up(project_dir)
+
+
+@pytest.mark.skipif(os.name == "nt", reason="POSIX signal behavior is tested on Unix")
+@pytest.mark.parametrize(
+    ("sig", "expected_returncode", "message"),
+    [
+        (signal.SIGINT, 130, "Installation cancelled."),
+        (signal.SIGTERM, 143, "Installation terminated."),
+    ],
+)
+@pytest.mark.parametrize("existing_env", [False, True])
+def test_install_sh_handles_signal_at_start_now_prompt_without_changing_env(
+    tmp_path: Path,
+    sig: signal.Signals,
+    expected_returncode: int,
+    message: str,
+    existing_env: bool,
+):
+    project_dir = _copy_installer_fixture(tmp_path)
+    original_content = "KEEP_ME='yes'\n"
+    if existing_env:
+        (project_dir / ".env").write_text(original_content, encoding="utf-8")
+
+    process = _open_install_process(project_dir)
+    assert process.stdin is not None
+    process.stdin.write(_inputs_before_start_now(existing_env))
+    process.stdin.flush()
+    time.sleep(0.5)
+    process.send_signal(sig)
+    stdout, stderr = process.communicate(timeout=10)
+
+    assert process.returncode in (expected_returncode, -sig)
+    assert message in (stderr + stdout)
+    if existing_env:
+        assert (project_dir / ".env").read_text(encoding="utf-8") == original_content
+    else:
+        assert not (project_dir / ".env").exists()
     assert list(project_dir.glob(".env.tmp.*")) == []
     _assert_no_compose_up(project_dir)

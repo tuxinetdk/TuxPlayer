@@ -218,13 +218,13 @@ main() {
   prompt_default log_level "Log level" "INFO"
 
   validate_admin_inputs
+  confirm_yes_no start_now "Build and start TuxPlayer now with docker compose up -d --build?" "yes"
   write_env_file_atomically
 
   printf '\nCreated %s\n' "$ENV_FILE"
   printf 'UI URL: %s\n' "$public_base_url"
   printf 'Stream URL: %s/stream/\n' "$public_base_url"
 
-  confirm_yes_no start_now "Build and start TuxPlayer now with docker compose up -d --build?" "yes"
   if [ "$start_now" = "yes" ]; then
     (cd "$SCRIPT_DIR" && docker compose up -d --build)
     printf '\nTuxPlayer is starting.\n'
