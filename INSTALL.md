@@ -19,6 +19,8 @@ chmod +x install.sh
 ./install.sh
 ```
 
+`install.sh` requires Bash.
+
 The installer will:
 
 - create `.env` from your answers
@@ -26,6 +28,7 @@ The installer will:
 - set `.env` file permissions to `0600`
 - preserve `.env.example`
 - create the `data/` directory if needed
+- write Docker Compose-compatible single-quoted dotenv values
 - optionally run `docker compose up -d --build`
 
 ## Manual Installation
@@ -56,10 +59,15 @@ docker compose up -d --build
 The installer accepts secrets and passwords with:
 
 - `$`
+- `${VAR}`
 - spaces
 - backslashes
 - single quotes
 - double quotes
+
+Leading and trailing spaces in secrets and passwords are preserved exactly.
+
+The generated `.env` values are validated through `docker compose config` in the test suite to ensure Docker Compose parses them correctly.
 
 ## After Installation
 
@@ -104,6 +112,7 @@ If the UI loads but Twitch status stays offline:
 - If both `ADMIN_USERNAME` and `ADMIN_PASSWORD` are empty, admin login is intentionally disabled.
 - If both are set, admin login is enabled.
 - If only one of them is provided, installation aborts without overwriting the existing `.env`.
+- A password made only of spaces still counts as a real password value.
 
 At runtime, the application also fails closed and refuses to start with a half-configured admin login.
 
@@ -114,3 +123,4 @@ At runtime, the application also fails closed and refuses to start with a half-c
 - Set `ADMIN_USERNAME` and `ADMIN_PASSWORD` if other people can reach the UI.
 - Use HTTPS and a reverse proxy if external access is required.
 - Twitch Client Secret is sent in the OAuth POST body and should never be logged or placed in request URLs.
+- The repository tests find Bash dynamically and do not depend on local workstation paths.

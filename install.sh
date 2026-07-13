@@ -32,7 +32,7 @@ require_command() {
 }
 
 dotenv_escape_single_quoted() {
-  printf "%s" "$1" | sed "s/'/'\\\\''/g"
+  printf '%s' "$1" | sed "s/'/\\\\'/g"
 }
 
 write_env_line() {

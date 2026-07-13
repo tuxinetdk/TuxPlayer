@@ -50,6 +50,8 @@ chmod +x install.sh
 ./install.sh
 ```
 
+`install.sh` requires Bash.
+
 ## Access
 
 - UI: [http://SERVER_IP:8766](http://SERVER_IP:8766)
@@ -87,7 +89,7 @@ Important variables:
 - `ADMIN_PASSWORD=`
 - `LOG_LEVEL=INFO`
 
-Leave `ADMIN_USERNAME` or `ADMIN_PASSWORD` empty if you intentionally want to disable admin login. When both are set, the admin UI and protected endpoints require Basic Auth.
+Leave both `ADMIN_USERNAME` and `ADMIN_PASSWORD` empty if you intentionally want to disable admin login. When both are set, the admin UI and protected endpoints require Basic Auth.
 
 ## Security and Network Access
 
@@ -105,6 +107,8 @@ Leave `ADMIN_USERNAME` or `ADMIN_PASSWORD` empty if you intentionally want to di
 If `TWITCH_CLIENT_ID` and `TWITCH_CLIENT_SECRET` are set, TuxPlayer uses the Twitch API for live status, title, viewer count, and profile image data.
 
 The Twitch OAuth token request is sent as form-encoded POST data. Secrets should never appear in request URLs or logs.
+
+The installer writes dotenv values using Docker Compose-compatible single-quoted syntax. `$`, `${VAR}`, spaces, backslashes, single quotes, double quotes, and leading or trailing spaces in secrets and passwords are preserved and verified through `docker compose config`.
 
 If they are empty, the system still works, but the UI will typically show `unknown` until playback is attempted or Streamlink returns an error.
 
@@ -197,7 +201,8 @@ This project is licensed under the TuxPlayer No-Resale License. See [LICENSE](LI
 - local Codex/test artifacts are ignored
 - `app/static/banner.png` is used at the top of this README and in the web UI
 - `install.sh` writes `.env` with `0600` permissions
-- `install.sh` supports passwords and secrets containing `$`, spaces, quotes, and backslashes
+- `install.sh` supports passwords and secrets containing `$`, `${VAR}`, spaces, quotes, and backslashes
+- installer tests find Bash dynamically and do not rely on local machine paths
 
 ## Project Structure
 
