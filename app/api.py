@@ -129,6 +129,6 @@ def restart_stream(request: Request) -> dict[str, str]:
     return {"status": "ok"}
 
 
-@router.get("/api/logs")
+@router.get("/api/logs", dependencies=[Depends(_require_admin)])
 def logs(request: Request, limit: int = 100) -> dict[str, list[str]]:
     return {"logs": request.app.state.log_buffer.tail(limit=max(1, min(limit, 200)))}

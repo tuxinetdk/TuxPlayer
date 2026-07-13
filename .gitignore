@@ -1,4 +1,6 @@
 .env
+.env.*
+!.env.example
 .agents/
 __pycache__/
 .pytest_cache/
@@ -8,7 +10,6 @@ __pycache__/
 Thumbs.db
 *.log
 *.pyc
-data/*.db
-data/*.db-shm
-data/*.db-wal
+data/*
+!data/.gitkeep
 tuxplayer.md

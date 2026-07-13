@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import re
 
+from app.config import Settings
 from app.models import validate_twitch_name
+from tests.conftest import build_test_client
 
 
 def test_validate_twitch_name_accepts_valid_name():
@@ -155,3 +157,32 @@ def test_web_form_updates_volume_setting(client):
     assert post_response.status_code == 303
     status_payload = client.get("/api/status").json()
     assert status_payload["stream_volume"] == 2.4
+
+
+def test_api_logs_requires_auth_when_admin_enabled(tmp_path):
+    settings = Settings(
+        public_base_url="http://127.0.0.1:8766",
+        stream_idle_timeout=30,
+        stream_bitrate="160k",
+        stream_sample_rate=44100,
+        admin_username="admin",
+        admin_password="secret",
+        database_path=tmp_path / "tuxplayer.db",
+    )
+    with build_test_client(settings) as client:
+        response = client.get("/api/logs")
+        assert response.status_code == 401
+
+
+def test_api_logs_works_without_auth_when_admin_disabled(tmp_path):
+    settings = Settings(
+        public_base_url="http://127.0.0.1:8766",
+        stream_idle_timeout=30,
+        stream_bitrate="160k",
+        stream_sample_rate=44100,
+        database_path=tmp_path / "tuxplayer.db",
+    )
+    with build_test_client(settings) as client:
+        response = client.get("/api/logs")
+        assert response.status_code == 200
+        assert "logs" in response.json()

@@ -66,8 +66,19 @@ class TwitchStatusClient:
                     )
             self._cache[cache_key] = (now + 45, status)
             return status
+        except httpx.HTTPStatusError as exc:
+            self.logger.warning(
+                "Twitch API status failed for %s: HTTP %s",
+                twitch_name,
+                exc.response.status_code,
+            )
+            return TwitchChannelStatus(state="unknown")
         except Exception as exc:
-            self.logger.warning("Twitch API status failed for %s: %s", twitch_name, exc)
+            self.logger.warning(
+                "Twitch API status failed for %s: %s",
+                twitch_name,
+                type(exc).__name__,
+            )
             return TwitchChannelStatus(state="unknown")
 
     def close(self) -> None:

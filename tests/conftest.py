@@ -9,15 +9,7 @@ from app.config import Settings
 from app.main import create_app
 
 
-@pytest.fixture
-def client(tmp_path: Path) -> TestClient:
-    settings = Settings(
-        public_base_url="http://127.0.0.1:8766",
-        stream_idle_timeout=30,
-        stream_bitrate="160k",
-        stream_sample_rate=44100,
-        database_path=tmp_path / "tuxplayer.db",
-    )
+def build_test_client(settings: Settings) -> TestClient:
     app = create_app(settings)
     original_manager = app.state.stream_manager
 
@@ -74,5 +66,17 @@ def client(tmp_path: Path) -> TestClient:
 
     original_manager.shutdown()
     app.state.stream_manager = FakeStreamManager(original_manager)
-    with TestClient(app) as test_client:
+    return TestClient(app)
+
+
+@pytest.fixture
+def client(tmp_path: Path) -> TestClient:
+    settings = Settings(
+        public_base_url="http://127.0.0.1:8766",
+        stream_idle_timeout=30,
+        stream_bitrate="160k",
+        stream_sample_rate=44100,
+        database_path=tmp_path / "tuxplayer.db",
+    )
+    with build_test_client(settings) as test_client:
         yield test_client

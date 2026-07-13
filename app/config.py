@@ -7,7 +7,7 @@ from pathlib import Path
 
 @dataclass(slots=True)
 class Settings:
-    public_base_url: str = "http://192.168.2.124:8766"
+    public_base_url: str = "http://localhost:8766"
     stream_idle_timeout: int = 30
     stream_bitrate: str = "160k"
     stream_sample_rate: int = 44100
@@ -30,7 +30,7 @@ class Settings:
         if not default_db.parent.exists():
             default_db = Path.cwd() / "data" / "tuxplayer.db"
         return cls(
-            public_base_url=os.getenv("PUBLIC_BASE_URL", "http://192.168.2.124:8766").rstrip("/"),
+            public_base_url=os.getenv("PUBLIC_BASE_URL", "http://localhost:8766").rstrip("/"),
             stream_idle_timeout=max(1, int(os.getenv("STREAM_IDLE_TIMEOUT", "30"))),
             stream_bitrate=os.getenv("STREAM_BITRATE", "160k"),
             stream_sample_rate=max(8000, int(os.getenv("STREAM_SAMPLE_RATE", "44100"))),

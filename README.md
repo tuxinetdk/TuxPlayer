@@ -43,6 +43,13 @@ nano .env
 docker compose up -d --build
 ```
 
+For a guided setup, see [INSTALL.md](INSTALL.md) or run:
+
+```bash
+chmod +x install.sh
+./install.sh
+```
+
 ## Access
 
 - UI: [http://SERVER_IP:8766](http://SERVER_IP:8766)
@@ -79,6 +86,17 @@ Important variables:
 - `ADMIN_USERNAME=`
 - `ADMIN_PASSWORD=`
 - `LOG_LEVEL=INFO`
+
+Leave `ADMIN_USERNAME` or `ADMIN_PASSWORD` empty if you intentionally want to disable admin login. When both are set, the admin UI and protected endpoints require Basic Auth.
+
+## Security and Network Access
+
+- TuxPlayer is primarily intended for use on a trusted local network.
+- Port `8766` should not be exposed directly to the public internet.
+- Configure `ADMIN_USERNAME` and `ADMIN_PASSWORD` before using the service outside a private LAN.
+- Use HTTPS and a reverse proxy if external access is required.
+- The `/stream/` endpoint is intentionally public on the local TuxPlayer instance so Music Assistant can consume it without login prompts.
+- Logs and mutating API endpoints require admin login when admin authentication is configured.
 
 ## Twitch API Credentials
 
@@ -164,20 +182,16 @@ docker compose build --no-cache
 docker compose up -d
 ```
 
+## License
+
+This project is licensed under the TuxPlayer No-Resale License. See [LICENSE](LICENSE).
+
 ## Repository Notes
 
 - `.env` is ignored
 - SQLite database files in `data/` are ignored
 - local Codex/test artifacts are ignored
 - `app/static/banner.png` is used at the top of this README and in the web UI
-
-## License
-
-TuxPlayer is source-available under the TuxPlayer No-Resale License.
-
-You may use and modify the software for personal, educational, professional, and internal business purposes. You may not sell, rent, sublicense, commercially redistribute, or offer TuxPlayer as a paid service without prior written permission from Thomas / TuxiNet.
-
-See the LICENSE file for the full license terms.
 
 ## Project Structure
 
@@ -193,6 +207,9 @@ tuxplayer/
 ├── .gitignore
 ├── docker-compose.yml
 ├── Dockerfile
+├── install.sh
+├── INSTALL.md
+├── LICENSE
 ├── README.md
 └── requirements.txt
 ```
