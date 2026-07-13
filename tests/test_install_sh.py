@@ -448,11 +448,10 @@ def test_install_sh_stops_on_input_end_at_start_now_prompt_without_changing_env(
         (project_dir / ".env").write_text(original_content, encoding="utf-8")
 
     process = _open_install_process(project_dir)
-    assert process.stdin is not None
-    process.stdin.write(_inputs_before_start_now(existing_env))
-    process.stdin.flush()
-    process.stdin.close()
-    stdout, stderr = process.communicate(timeout=10)
+    stdout, stderr = process.communicate(
+        input=_inputs_before_start_now(existing_env),
+        timeout=10,
+    )
 
     output = stderr + stdout
     assert process.returncode != 0
