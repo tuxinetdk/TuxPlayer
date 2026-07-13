@@ -14,7 +14,24 @@ cleanup() {
   fi
 }
 
-trap cleanup EXIT INT TERM
+handle_interrupt() {
+  printf '\nInstallation cancelled.\n' >&2
+  exit 130
+}
+
+handle_termination() {
+  printf '\nInstallation terminated.\n' >&2
+  exit 143
+}
+
+handle_input_end() {
+  printf '\nInput ended. Installation cancelled.\n' >&2
+  exit 1
+}
+
+trap cleanup EXIT
+trap handle_interrupt INT
+trap handle_termination TERM
 
 assign_var() {
   printf -v "$1" '%s' "$2"
@@ -41,13 +58,28 @@ write_env_line() {
   printf "%s='%s'\n" "$key" "$(dotenv_escape_single_quoted "$value")" >> "$TEMP_ENV_FILE"
 }
 
+read_input_line() {
+  if ! IFS= read -r input_value; then
+    handle_input_end
+  fi
+  input_value="$(strip_carriage_return "$input_value")"
+}
+
+read_secret_line() {
+  if ! IFS= read -r -s input_value; then
+    printf '\n' >&2
+    handle_input_end
+  fi
+  input_value="$(strip_carriage_return "$input_value")"
+  printf '\n'
+}
+
 prompt_default() {
   var_name="$1"
   prompt_text="$2"
   default_value="$3"
   printf '%s [%s]: ' "$prompt_text" "$default_value"
-  IFS= read -r input_value || true
-  input_value="$(strip_carriage_return "$input_value")"
+  read_input_line
   if [ -z "$input_value" ]; then
     assign_var "$var_name" "$default_value"
   else
@@ -59,8 +91,7 @@ prompt_optional() {
   var_name="$1"
   prompt_text="$2"
   printf '%s: ' "$prompt_text"
-  IFS= read -r input_value || true
-  input_value="$(strip_carriage_return "$input_value")"
+  read_input_line
   assign_var "$var_name" "$input_value"
 }
 
@@ -68,9 +99,7 @@ prompt_secret() {
   var_name="$1"
   prompt_text="$2"
   printf '%s: ' "$prompt_text"
-  IFS= read -r -s input_value || true
-  input_value="$(strip_carriage_return "$input_value")"
-  printf '\n'
+  read_secret_line
   assign_var "$var_name" "$input_value"
 }
 
@@ -79,8 +108,7 @@ confirm_yes_no() {
   prompt_text="$2"
   default_value="$3"
   printf '%s [%s]: ' "$prompt_text" "$default_value"
-  IFS= read -r input_value || true
-  input_value="$(strip_carriage_return "$input_value")"
+  read_input_line
   input_value="$(printf '%s' "${input_value:-$default_value}" | tr '[:upper:]' '[:lower:]')"
   case "$input_value" in
     y|yes) assign_var "$var_name" "yes" ;;
@@ -93,7 +121,31 @@ confirm_yes_no() {
 }
 
 validate_admin_inputs() {
-  if { [ -n "$admin_username" ] && [ -z "$admin_password" ]; } || { [ -z "$admin_username" ] && [ -n "$admin_password" ]; }; then
+  trimmed_admin_username="$(printf '%s' "$admin_username" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+  username_set="0"
+  password_set="0"
+  password_has_content="0"
+
+  if [ -n "$trimmed_admin_username" ]; then
+    username_set="1"
+  fi
+  if [ -n "$admin_password" ]; then
+    password_set="1"
+  fi
+  if printf '%s' "$admin_password" | grep -q '[^[:space:]]'; then
+    password_has_content="1"
+  fi
+
+  assign_var admin_username "$trimmed_admin_username"
+
+  if [ "$username_set" = "0" ] && [ "$password_set" = "0" ]; then
+    return
+  fi
+  if [ "$password_set" = "1" ] && [ "$password_has_content" = "0" ]; then
+    printf 'ADMIN_PASSWORD must contain at least one non-whitespace character.\n' >&2
+    exit 1
+  fi
+  if [ "$username_set" = "0" ] || [ "$password_set" = "0" ]; then
     printf 'Admin username and password must either both be provided or both be left empty.\n' >&2
     exit 1
   fi

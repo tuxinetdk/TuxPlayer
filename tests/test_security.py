@@ -100,6 +100,13 @@ def test_admin_config_allows_both_set():
     assert settings.admin_auth_enabled is True
 
 
+def test_admin_config_allows_password_with_leading_and_trailing_spaces():
+    settings = Settings(admin_username="admin", admin_password=" password with spaces ")
+    settings.validate_admin_credentials()
+    assert settings.admin_password == " password with spaces "
+    assert settings.admin_auth_enabled is True
+
+
 def test_admin_config_rejects_username_only():
     with pytest.raises(ValueError, match="ADMIN_USERNAME and ADMIN_PASSWORD must either both be set or both be empty."):
         Settings(admin_username="admin", admin_password="").validate_admin_credentials()
@@ -111,6 +118,25 @@ def test_admin_config_rejects_password_only_without_leaking_secret():
     message = str(excinfo.value)
     assert "ADMIN_USERNAME and ADMIN_PASSWORD must either both be set or both be empty." in message
     assert "very-secret" not in message
+
+
+def test_admin_config_rejects_whitespace_only_password_without_leaking_value():
+    with pytest.raises(ValueError) as excinfo:
+        Settings(admin_username="admin", admin_password="   ").validate_admin_credentials()
+    message = str(excinfo.value)
+    assert "ADMIN_PASSWORD must contain at least one non-whitespace character." in message
+    assert "   " not in message
+
+
+def test_from_env_allows_whitespace_only_username_when_password_is_empty(monkeypatch):
+    monkeypatch.setenv("ADMIN_USERNAME", "   ")
+    monkeypatch.setenv("ADMIN_PASSWORD", "")
+
+    settings = Settings.from_env()
+
+    assert settings.admin_username == ""
+    assert settings.admin_password == ""
+    assert settings.admin_auth_enabled is False
 
 
 def test_from_env_preserves_twitch_secret_and_admin_password_whitespace(monkeypatch):
@@ -136,5 +162,5 @@ def test_from_env_rejects_trimmed_username_with_whitespace_only_password_without
         Settings.from_env()
 
     message = str(excinfo.value)
-    assert "ADMIN_USERNAME and ADMIN_PASSWORD must either both be set or both be empty." in message
+    assert "ADMIN_PASSWORD must contain at least one non-whitespace character." in message
     assert "   " not in message

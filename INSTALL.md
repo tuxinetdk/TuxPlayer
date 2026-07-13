@@ -20,12 +20,15 @@ chmod +x install.sh
 ```
 
 `install.sh` requires Bash.
+Pressing `Ctrl+C`, sending `SIGTERM`, or ending stdin cancels the installer safely.
 
 The installer will:
 
 - create `.env` from your answers
 - write `.env` atomically through a temporary file
 - set `.env` file permissions to `0600`
+- preserve an existing `.env` on cancellation or input errors
+- clean up temporary `.env.tmp.*` files on failure or interruption
 - preserve `.env.example`
 - create the `data/` directory if needed
 - write Docker Compose-compatible single-quoted dotenv values
@@ -67,7 +70,7 @@ The installer accepts secrets and passwords with:
 
 Leading and trailing spaces in secrets and passwords are preserved exactly.
 
-The generated `.env` values are validated through `docker compose config` in the test suite to ensure Docker Compose parses them correctly.
+The generated `.env` values are validated through `docker compose config` in the test suite using the same `env_file` mechanism as the real TuxPlayer Compose configuration.
 
 ## After Installation
 
@@ -112,7 +115,7 @@ If the UI loads but Twitch status stays offline:
 - If both `ADMIN_USERNAME` and `ADMIN_PASSWORD` are empty, admin login is intentionally disabled.
 - If both are set, admin login is enabled.
 - If only one of them is provided, installation aborts without overwriting the existing `.env`.
-- A password made only of spaces still counts as a real password value.
+- A password made only of whitespace is rejected.
 
 At runtime, the application also fails closed and refuses to start with a half-configured admin login.
 

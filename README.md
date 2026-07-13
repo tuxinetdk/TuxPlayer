@@ -51,6 +51,7 @@ chmod +x install.sh
 ```
 
 `install.sh` requires Bash.
+Pressing `Ctrl+C`, sending `SIGTERM`, or ending stdin cancels the installer safely.
 
 ## Access
 
@@ -90,6 +91,7 @@ Important variables:
 - `LOG_LEVEL=INFO`
 
 Leave both `ADMIN_USERNAME` and `ADMIN_PASSWORD` empty if you intentionally want to disable admin login. When both are set, the admin UI and protected endpoints require Basic Auth.
+Passwords may include leading or trailing spaces, but a password that consists only of whitespace is rejected.
 
 ## Security and Network Access
 
@@ -108,7 +110,7 @@ If `TWITCH_CLIENT_ID` and `TWITCH_CLIENT_SECRET` are set, TuxPlayer uses the Twi
 
 The Twitch OAuth token request is sent as form-encoded POST data. Secrets should never appear in request URLs or logs.
 
-The installer writes dotenv values using Docker Compose-compatible single-quoted syntax. `$`, `${VAR}`, spaces, backslashes, single quotes, double quotes, and leading or trailing spaces in secrets and passwords are preserved and verified through `docker compose config`.
+The installer writes dotenv values using Docker Compose-compatible single-quoted syntax. `$`, `${VAR}`, spaces, backslashes, single quotes, double quotes, and leading or trailing spaces in secrets and passwords are preserved and verified through the same `env_file` mechanism that the real `docker-compose.yml` uses.
 
 If they are empty, the system still works, but the UI will typically show `unknown` until playback is attempted or Streamlink returns an error.
 
@@ -202,6 +204,7 @@ This project is licensed under the TuxPlayer No-Resale License. See [LICENSE](LI
 - `app/static/banner.png` is used at the top of this README and in the web UI
 - `install.sh` writes `.env` with `0600` permissions
 - `install.sh` supports passwords and secrets containing `$`, `${VAR}`, spaces, quotes, and backslashes
+- `install.sh` preserves an existing `.env` on cancellation or input failure and cleans up temporary `.env.tmp.*` files
 - installer tests find Bash dynamically and do not rely on local machine paths
 
 ## Project Structure

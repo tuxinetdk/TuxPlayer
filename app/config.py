@@ -59,8 +59,13 @@ class Settings:
         return bool(self.admin_username and self.admin_password)
 
     def validate_admin_credentials(self) -> None:
-        both_empty = not self.admin_username and not self.admin_password
-        both_set = bool(self.admin_username and self.admin_password)
-        if both_empty or both_set:
+        username_set = bool(self.admin_username)
+        password_set = bool(self.admin_password)
+        password_has_content = bool(self.admin_password.strip())
+
+        if not username_set and not password_set:
             return
-        raise ValueError("ADMIN_USERNAME and ADMIN_PASSWORD must either both be set or both be empty.")
+        if password_set and not password_has_content:
+            raise ValueError("ADMIN_PASSWORD must contain at least one non-whitespace character.")
+        if not username_set or not password_set:
+            raise ValueError("ADMIN_USERNAME and ADMIN_PASSWORD must either both be set or both be empty.")
