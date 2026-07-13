@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 
 import httpx
+import pytest
 
 from app.config import Settings
 from app.twitch import TwitchChannelStatus, TwitchStatusClient
@@ -44,3 +46,68 @@ def test_twitch_http_errors_do_not_log_client_secret_or_token_url(caplog):
     assert "https://id.twitch.tv/oauth2/token" not in caplog.text
     assert "HTTP 401" in caplog.text
     client.close()
+
+
+def test_twitch_token_request_uses_post_body_not_query_string():
+    settings = Settings(
+        public_base_url="http://localhost:8766",
+        twitch_client_id="test-client-id",
+        twitch_client_secret="super-secret-value",
+    )
+    logger = logging.getLogger("twitch-request-test")
+    client = TwitchStatusClient(settings, logger)
+    captured: dict[str, object] = {}
+
+    def fake_post(url: str, **kwargs):
+        captured["url"] = url
+        captured["params"] = kwargs.get("params")
+        captured["data"] = kwargs.get("data")
+
+        class FakeResponse:
+            def raise_for_status(self) -> None:
+                return None
+
+            def json(self) -> dict[str, object]:
+                return {"access_token": "fake-token", "expires_in": 3600}
+
+        return FakeResponse()
+
+    client._client.post = fake_post  # type: ignore[method-assign]
+    token = client._ensure_token()
+    assert token == "fake-token"
+    assert captured["url"] == "https://id.twitch.tv/oauth2/token"
+    assert captured["params"] is None
+    assert captured["data"] == {
+        "client_id": "test-client-id",
+        "client_secret": "super-secret-value",
+        "grant_type": "client_credentials",
+    }
+    assert "client_secret=" not in str(captured["url"])
+    assert "client_id=" not in str(captured["url"])
+    assert "grant_type=" not in str(captured["url"])
+    client.close()
+
+
+def test_admin_config_allows_both_empty():
+    settings = Settings(admin_username="", admin_password="")
+    settings.validate_admin_credentials()
+    assert settings.admin_auth_enabled is False
+
+
+def test_admin_config_allows_both_set():
+    settings = Settings(admin_username="admin", admin_password="secret")
+    settings.validate_admin_credentials()
+    assert settings.admin_auth_enabled is True
+
+
+def test_admin_config_rejects_username_only():
+    with pytest.raises(ValueError, match="ADMIN_USERNAME and ADMIN_PASSWORD must either both be set or both be empty."):
+        Settings(admin_username="admin", admin_password="").validate_admin_credentials()
+
+
+def test_admin_config_rejects_password_only_without_leaking_secret():
+    with pytest.raises(ValueError) as excinfo:
+        Settings(admin_username="", admin_password="very-secret").validate_admin_credentials()
+    message = str(excinfo.value)
+    assert "ADMIN_USERNAME and ADMIN_PASSWORD must either both be set or both be empty." in message
+    assert "very-secret" not in message

@@ -36,6 +36,7 @@ def configure_logging(level: str) -> tuple[logging.Logger, RingBufferHandler]:
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     app_settings = settings or Settings.from_env()
+    app_settings.validate_admin_credentials()
     logger, log_buffer = configure_logging(app_settings.log_level)
     database = Database(app_settings.database_path)
     database.initialize()

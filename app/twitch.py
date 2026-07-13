@@ -90,7 +90,7 @@ class TwitchStatusClient:
                 return self._token
             response = self._client.post(
                 "https://id.twitch.tv/oauth2/token",
-                params={
+                data={
                     "client_id": self.settings.twitch_client_id,
                     "client_secret": self.settings.twitch_client_secret,
                     "grant_type": "client_credentials",

@@ -22,6 +22,8 @@ chmod +x install.sh
 The installer will:
 
 - create `.env` from your answers
+- write `.env` atomically through a temporary file
+- set `.env` file permissions to `0600`
 - preserve `.env.example`
 - create the `data/` directory if needed
 - optionally run `docker compose up -d --build`
@@ -50,6 +52,14 @@ docker compose up -d --build
 - Admin username
 - Admin password
 - Whether Docker should build and start the stack immediately
+
+The installer accepts secrets and passwords with:
+
+- `$`
+- spaces
+- backslashes
+- single quotes
+- double quotes
 
 ## After Installation
 
@@ -89,9 +99,18 @@ If the UI loads but Twitch status stays offline:
 - confirm your Twitch API credentials are correct if you use them
 - confirm `PUBLIC_BASE_URL` matches the real host IP or hostname
 
+## Admin Login Rules
+
+- If both `ADMIN_USERNAME` and `ADMIN_PASSWORD` are empty, admin login is intentionally disabled.
+- If both are set, admin login is enabled.
+- If only one of them is provided, installation aborts without overwriting the existing `.env`.
+
+At runtime, the application also fails closed and refuses to start with a half-configured admin login.
+
 ## Security Notes
 
 - TuxPlayer is meant for a trusted local network by default.
 - Do not expose port `8766` directly to the public internet.
 - Set `ADMIN_USERNAME` and `ADMIN_PASSWORD` if other people can reach the UI.
 - Use HTTPS and a reverse proxy if external access is required.
+- Twitch Client Secret is sent in the OAuth POST body and should never be logged or placed in request URLs.

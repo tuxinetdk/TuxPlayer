@@ -29,7 +29,7 @@ class Settings:
         default_db = Path("/app/data/tuxplayer.db")
         if not default_db.parent.exists():
             default_db = Path.cwd() / "data" / "tuxplayer.db"
-        return cls(
+        settings = cls(
             public_base_url=os.getenv("PUBLIC_BASE_URL", "http://localhost:8766").rstrip("/"),
             stream_idle_timeout=max(1, int(os.getenv("STREAM_IDLE_TIMEOUT", "30"))),
             stream_bitrate=os.getenv("STREAM_BITRATE", "160k"),
@@ -47,6 +47,8 @@ class Settings:
             tz=os.getenv("TZ", "Europe/Copenhagen"),
             database_path=Path(os.getenv("DATABASE_PATH", str(default_db))),
         )
+        settings.validate_admin_credentials()
+        return settings
 
     @property
     def stream_url(self) -> str:
@@ -55,3 +57,10 @@ class Settings:
     @property
     def admin_auth_enabled(self) -> bool:
         return bool(self.admin_username and self.admin_password)
+
+    def validate_admin_credentials(self) -> None:
+        both_empty = not self.admin_username and not self.admin_password
+        both_set = bool(self.admin_username and self.admin_password)
+        if both_empty or both_set:
+            return
+        raise ValueError("ADMIN_USERNAME and ADMIN_PASSWORD must either both be set or both be empty.")

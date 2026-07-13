@@ -94,6 +94,8 @@ Leave `ADMIN_USERNAME` or `ADMIN_PASSWORD` empty if you intentionally want to di
 - TuxPlayer is primarily intended for use on a trusted local network.
 - Port `8766` should not be exposed directly to the public internet.
 - Configure `ADMIN_USERNAME` and `ADMIN_PASSWORD` before using the service outside a private LAN.
+- `ADMIN_USERNAME` and `ADMIN_PASSWORD` must either both be set or both be empty.
+- A half-configured admin login is treated as an error and prevents startup.
 - Use HTTPS and a reverse proxy if external access is required.
 - The `/stream/` endpoint is intentionally public on the local TuxPlayer instance so Music Assistant can consume it without login prompts.
 - Logs and mutating API endpoints require admin login when admin authentication is configured.
@@ -101,6 +103,8 @@ Leave `ADMIN_USERNAME` or `ADMIN_PASSWORD` empty if you intentionally want to di
 ## Twitch API Credentials
 
 If `TWITCH_CLIENT_ID` and `TWITCH_CLIENT_SECRET` are set, TuxPlayer uses the Twitch API for live status, title, viewer count, and profile image data.
+
+The Twitch OAuth token request is sent as form-encoded POST data. Secrets should never appear in request URLs or logs.
 
 If they are empty, the system still works, but the UI will typically show `unknown` until playback is attempted or Streamlink returns an error.
 
@@ -192,6 +196,8 @@ This project is licensed under the TuxPlayer No-Resale License. See [LICENSE](LI
 - SQLite database files in `data/` are ignored
 - local Codex/test artifacts are ignored
 - `app/static/banner.png` is used at the top of this README and in the web UI
+- `install.sh` writes `.env` with `0600` permissions
+- `install.sh` supports passwords and secrets containing `$`, spaces, quotes, and backslashes
 
 ## Project Structure
 
